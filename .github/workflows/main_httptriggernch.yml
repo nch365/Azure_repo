@@ -61,8 +61,8 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B12579310C5A40089B0C640169DAFADE }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_587549F8BE9E4903A08BD13D8E7608D4 }}
 
-      - name: Debug files
-        run: ls myFunctionApp -Recurse
+      # - name: Debug files
+      #   run: ls myFunctionApp -Recurse
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
