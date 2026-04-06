@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: ./myFunctionApp   
+          path: ./myFunctionApp/*   
 
   deploy:
     runs-on: windows-latest
