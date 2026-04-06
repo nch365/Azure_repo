@@ -67,7 +67,7 @@ jobs:
           # Get existing app settings
           $appSettings = az functionapp config appsettings list `
             --name httptriggernch `
-            --resource-group <YOUR_RESOURCE_GROUP> | ConvertFrom-Json
+            --resource-group Azure_apps | ConvertFrom-Json
 
           # Check if already set
           $setting = $appSettings | Where-Object {$_.name -eq "WEBSITE_RUN_FROM_PACKAGE"}
