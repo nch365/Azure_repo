@@ -81,6 +81,10 @@ jobs:
           } else {
             Write-Host "WEBSITE_RUN_FROM_PACKAGE already set!"
           }
+      - name: Move functions to root
+          shell: pwsh
+          run: |
+          Copy-Item -Path myFunctionApp/src/functions/* -Destination myFunctionApp/ -Recurse -Force
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
