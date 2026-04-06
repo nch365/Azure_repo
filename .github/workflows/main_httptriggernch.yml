@@ -9,6 +9,7 @@ on:
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: './myFunctionApp'
   NODE_VERSION: '20.x'
+  RESOURCE_GROUP: 'Azure_apps'
 
 jobs:
   build:
@@ -67,7 +68,7 @@ jobs:
           # Get existing app settings
           $appSettings = az functionapp config appsettings list `
             --name httptriggernch `
-            --resource-group Azure_apps | ConvertFrom-Json
+            --resource-group ${{ env.RESOURCE_GROUP }} | ConvertFrom-Json
 
           # Check if already set
           $setting = $appSettings | Where-Object {$_.name -eq "WEBSITE_RUN_FROM_PACKAGE"}
@@ -75,7 +76,7 @@ jobs:
             Write-Host "Adding WEBSITE_RUN_FROM_PACKAGE=1"
             az functionapp config appsettings set `
               --name httptriggernch `
-              --resource-group <YOUR_RESOURCE_GROUP> `
+              --resource-group ${{ env.RESOURCE_GROUP }} `
               --settings WEBSITE_RUN_FROM_PACKAGE=1
           } else {
             Write-Host "WEBSITE_RUN_FROM_PACKAGE already set"
