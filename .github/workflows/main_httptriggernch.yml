@@ -79,7 +79,7 @@ jobs:
               --resource-group ${{ env.RESOURCE_GROUP }} `
               --settings WEBSITE_RUN_FROM_PACKAGE=1
           } else {
-            Write-Host "WEBSITE_RUN_FROM_PACKAGE already set"
+            Write-Host "WEBSITE_RUN_FROM_PACKAGE already set!"
           }
 
       - name: 'Run Azure Functions Action'
