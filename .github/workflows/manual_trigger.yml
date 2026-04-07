@@ -1,7 +1,8 @@
 name: Manual Deploy to Azure Function
 
 on:
-  workflow_dispatch:  
+  workflow_dispatch:
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -13,15 +14,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '24'
+          node-version: '18'   
 
       - name: Install dependencies
+        working-directory: ./Git_Azure   
         run: npm install
-
 
       - name: Deploy to Azure Function
         uses: Azure/functions-action@v1
         with:
           app-name: httptriggernch
-          package: '.'
+          package: './Git_Azure'   
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
