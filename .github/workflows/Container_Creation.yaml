@@ -50,6 +50,5 @@ jobs:
             az storage container create \
               --name "$container" \
               --connection-string "$AZURE_STORAGE_CONNECTION_STRING" \
-              --fail-on-exist
 
           done
