@@ -1,0 +1,120 @@
+name: Create Blob Containers
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment Environment"
+        required: true
+        type: choice
+        options:
+          - SIT
+          - UAT
+          - PROD
+
+      storage_account:
+        description: "Select Storage Account"
+        required: true
+        type: choice
+        options:
+          - sitstorage123
+          - uatstorage123
+          - prodstorage123
+
+      container_file_path:
+        description: "Path to container JSON file"
+        required: true
+        default: "configs/containers.json"
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  create-containers:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      # Checkout (needed for JSON file)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # # Validation
+      # - name: Validate branch vs selected environment
+      #   id: validate
+      #   shell: bash
+      #   run: |
+      #     set -euo pipefail
+
+      #     BRANCH="${GITHUB_REF_NAME}"
+      #     SELECTED_ENV="${{ inputs.environment }}"
+
+      #     echo "Branch detected: ${BRANCH}"
+      #     echo "Selected environment: ${SELECTED_ENV}"
+
+      #     if [[ "${BRANCH}" == "Develop" ]]; then
+      #       EXPECTED_ENV="SIT"
+      #     elif [[ "${BRANCH}" == "main" ]]; then
+      #       EXPECTED_ENV="UAT"
+      #     elif [[ "${BRANCH}" == release* ]]; then
+      #       EXPECTED_ENV="PROD"
+      #     else
+      #       echo "::error::Branch '${BRANCH}' is not allowed for deployment. Allowed: Develop, main, release*."
+      #       exit 1
+      #     fi
+
+      #     if [[ "${SELECTED_ENV}" != "${EXPECTED_ENV}" ]]; then
+      #       echo "::error::Invalid environment selection. Branch '${BRANCH}' must deploy to '${EXPECTED_ENV}', but you selected '${SELECTED_ENV}'."
+      #       exit 1
+      #     fi
+
+      #     echo "Validation passed: ${BRANCH} → ${EXPECTED_ENV}"
+
+      # Azure Login
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Validate JSON file
+      - name: Validate JSON file
+        shell: bash
+        run: |
+          FILE="${{ inputs.container_file_path }}"
+          if [ ! -f "$FILE" ]; then
+            echo "::error::File not found: $FILE"
+            exit 1
+          fi
+          echo "File content:"
+          cat "$FILE"
+
+      # Create Containers
+      - name: Create Blob Containers
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            set -euo pipefail
+
+            FILE_PATH="${{ inputs.container_file_path }}"
+            STORAGE_ACCOUNT="${{ inputs.storage_account }}"
+
+            echo "Using storage account: $STORAGE_ACCOUNT"
+
+            containers=$(jq -r '.containers[]' "$FILE_PATH")
+
+            for container in $containers; do
+              echo "----------------------------------------"
+              echo "Processing container: $container"
+
+              az storage container create \
+                --name "$container" \
+                --account-name "$STORAGE_ACCOUNT" \
+                --auth-mode login \
+                --fail-on-exist false
+
+              echo "Done: $container"
+            done
+
+            echo "All containers processed"
