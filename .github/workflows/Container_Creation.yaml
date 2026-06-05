@@ -1,4 +1,4 @@
-name: Create Storage Container
+name: Create Storage Containers (JSON Input)
 
 on:
   workflow_dispatch:
@@ -6,26 +6,50 @@ on:
       storage_account:
         description: "Storage Account Name"
         required: true
-        default: "mystorageaccount"
-
-      container_name:
-        description: "Container Name"
+      json_path:
+        description: "Path to JSON file (e.g., ./config/containers.json)"
         required: true
-        default: "my-container"
+        default: "./containers.json"
 
 jobs:
-  create-container:
+  create-containers:
     runs-on: ubuntu-latest
 
+    env:
+      AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+
     steps:
-      - name: Install Azure CLI
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Azure CLI + jq
         run: |
           curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          sudo apt-get install -y jq
 
-      - name: Create Blob Container
-        env:
-          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+      - name: Create containers from JSON
         run: |
-          az storage container create \
-            --name ${{ github.event.inputs.container_name }} \
-            --connection-string "$AZURE_STORAGE_CONNECTION_STRING"
+          echo "Storage Account (input): ${{ github.event.inputs.storage_account }}"
+          echo "Reading JSON from: ${{ github.event.inputs.json_path }}"
+
+          containers=$(jq -r '.containers[]' "${{ github.event.inputs.json_path }}")
+
+          for container in $containers; do
+
+            # Convert to lowercase
+            container=$(echo "$container" | tr '[:upper:]' '[:lower:]')
+
+            # Validate name
+            if [[ ! "$container" =~ ^[a-z0-9-]+$ ]]; then
+              echo "Invalid container name: $container"
+              exit 1
+            fi
+
+            echo "Creating container: $container"
+
+            az storage container create \
+              --name "$container" \
+              --connection-string "$AZURE_STORAGE_CONNECTION_STRING" \
+              --fail-on-exist false
+
+          done
