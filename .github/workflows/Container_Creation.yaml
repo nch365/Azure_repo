@@ -7,7 +7,7 @@ on:
         description: "Storage Account Name"
         required: true
       json_path:
-        description: "Path to JSON file (e.g., ./config/containers.json)"
+        description: "Path to JSON file (e.g., .github/config/containers.json)"
         required: true
         default: "./containers.json"
 
