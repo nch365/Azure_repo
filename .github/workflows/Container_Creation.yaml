@@ -9,7 +9,7 @@ on:
       json_path:
         description: "Path to JSON file (e.g., .github/config/containers.json)"
         required: true
-        default: "./containers.json"
+        default: ".github/config/containers.json"
 
 jobs:
   create-containers:
