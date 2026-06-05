@@ -1,0 +1,9 @@
+{
+  "containers": [
+    "app-data",
+    "logs",
+    "d365-dev",
+    "d365-uat",
+    "d365-prod"
+  ]
+}
