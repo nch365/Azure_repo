@@ -3,6 +3,8 @@
     "storageAccountName": {
       "value": "mystorage12345"
     },
+
+    
     "functionAppName": {
       "value": "my-function-app-12345"
     }
