@@ -1,12 +1,9 @@
 name: Manual PR Check
 
+
 on:
-  workflow_dispatch:
-    inputs:
-      pr_number:
-        description: 'Pull Request number'
-        required: true
-        type: number
+  pull_request:
+    branches: [main]
 
 # ✅ ADD THIS BLOCK (this is the fix)
 permissions:
@@ -37,7 +34,6 @@ jobs:
         with:
           script: |
             const outcome = '${{ job.status }}';
-            const prNumber = ${{ github.event.inputs.pr_number }};
             const icon = outcome === 'success' ? '✅' : '❌';
 
             const msg = outcome === 'success'
@@ -45,7 +41,6 @@ jobs:
               : `${icon} Manual check failed. Do not merge`;
 
             await github.rest.issues.createComment({
-              issue_number: prNumber,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: msg
