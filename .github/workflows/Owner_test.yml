@@ -2,10 +2,6 @@ name: Manual PR Check
 
 on:
   workflow_dispatch:
-    inputs:
-      pr_number:
-        description: 'Pull Request number'
-        required: true
 
 jobs:
   manual-check:
