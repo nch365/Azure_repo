@@ -1,18 +1,15 @@
-name: Manual PR Check
-
+name: PR Validation Check
 
 on:
   pull_request:
     branches: [main]
 
-# ✅ ADD THIS BLOCK (this is the fix)
 permissions:
-  contents: read
   issues: write
   pull-requests: write
 
 jobs:
-  manual-check:
+  validation:
     name: Manual Validation Check
     runs-on: ubuntu-latest
 
@@ -20,11 +17,14 @@ jobs:
       - name: Dummy validation
         id: validate
         run: |
-          echo "Running manual validation..."
+          echo "Running validation..."
 
+          # ✅ CHANGE THIS CONDITION
           if [ 1 -eq 1 ]; then
+            echo "PASSED"
             exit 0
           else
+            echo "FAILED"
             exit 1
           fi
 
@@ -37,11 +37,11 @@ jobs:
             const icon = outcome === 'success' ? '✅' : '❌';
 
             const msg = outcome === 'success'
-              ? `${icon} Manual check passed`
-              : `${icon} Manual check failed. Do not merge`;
+              ? `${icon} Validation Passed`
+              : `${icon} Validation Failed. Do not merge`;
 
             await github.rest.issues.createComment({
-              issue_number: context.issue.number
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: msg
