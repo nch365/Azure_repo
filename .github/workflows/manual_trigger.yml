@@ -9,7 +9,7 @@ on:
         type: choice
         options:
           - httptriggernch
-          - XYZ_App   
+          - NCHFunc  
 
       package_path:
         description: "Enter folder path (e.g., ./AZ_app)"
